@@ -56,12 +56,20 @@ export const useChatStore = create((set, get) => ({
 
     socket.on("newMessage", (newMessage) => {
       console.log("Received new message via socket:", newMessage);
-      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
-      if (!isMessageSentFromSelectedUser) return;
-
       set({
         messages: [...get().messages, newMessage],
       });
+
+      // Show toast notification
+      const senderName = newMessage.senderName || "New Message";
+      let body = newMessage.text || (newMessage.image ? "Sent an image" : newMessage.file ? "Sent a file" : "New message");
+      toast(`${senderName}: ${body}`);
+
+      // Show browser notification if window is not focused
+      if (document.visibilityState !== "visible" && "Notification" in window && Notification.permission === "granted") {
+        console.log("Triggering notification:", senderName, body);
+        new Notification(senderName, { body });
+      }
     });
   },
 

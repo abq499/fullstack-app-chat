@@ -24,6 +24,12 @@ const App = () => {
     checkAuth();
   }, [checkAuth]);
 
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
   console.log({ authUser });
 
   if (isCheckingAuth && !authUser)
